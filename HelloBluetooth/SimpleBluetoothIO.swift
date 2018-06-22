@@ -12,6 +12,7 @@ class SimpleBluetoothIO: NSObject {
     var connectedPeripheral: CBPeripheral?
     var targetService: CBService?
     var writableCharacteristic: CBCharacteristic?
+    var characteristicUUID = CBUUID(string: "FFE1")
 
     init(serviceUUID: String, delegate: SimpleBluetoothIODelegate?) {
         self.serviceUUID = serviceUUID
@@ -57,14 +58,8 @@ extension SimpleBluetoothIO: CBCentralManagerDelegate {
 
 extension SimpleBluetoothIO: CBPeripheralDelegate {
     func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
-        guard let services = peripheral.services else {
-            return
-        }
-
-        targetService = services.first
-        if let service = services.first {
-            targetService = service
-            peripheral.discoverCharacteristics(nil, for: service)
+        for service in peripheral.services! {
+            peripheral.discoverCharacteristics([characteristicUUID], for: service)
         }
     }
 
